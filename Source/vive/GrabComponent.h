@@ -24,6 +24,9 @@ public:
 	AActor* Owner;
 	APlayerController* Player;
 
+	void Grab(); // raycast and grab
+	void Release();
+
 private:
 	float Reach = 100.f;
 
@@ -31,10 +34,7 @@ private:
 	void SetupInputComponent();
 
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
-	UInputComponent* Input = nullptr;
-
-	void Grab(); // raycast and grab
-	void Release();
+	UInputComponent* Input = nullptr; // Do I need this?
 
 	const FHitResult GetFirstPhysicsBodyInReach();
 	FVector GetLineTraceStart();

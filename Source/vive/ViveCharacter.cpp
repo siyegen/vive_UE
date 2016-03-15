@@ -11,12 +11,12 @@ AViveCharacter::AViveCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 	/// Get Grab component
-	/*GrabComponent = CreateDefaultSubobject<UActorComponent>(TEXT("GrabComponent"));
+	GrabComponent = CreateDefaultSubobject<UGrabComponent>(TEXT("GrabComponent"));
 	if (GrabComponent) {
 		UE_LOG(LogTemp, Warning, TEXT("Got grabber"));
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Jack shit"));
-	}*/
+	}
 }
 
 // Called when the game starts or when spawned
@@ -41,8 +41,8 @@ void AViveCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompo
 	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
-	InputComponent->BindAction("Grab", IE_Pressed, this, &AViveCharacter::Grab);
-	InputComponent->BindAction("Grab", IE_Released, this, &AViveCharacter::Release);
+	InputComponent->BindAction("Use", IE_Pressed, this, &AViveCharacter::Use);
+	InputComponent->BindAction("Use", IE_Released, this, &AViveCharacter::UseRelease);
 }
 
 void AViveCharacter::MoveForward(float Val) {
@@ -57,12 +57,17 @@ void AViveCharacter::MoveRight(float Val) {
 	}
 }
 
-void AViveCharacter::Grab() {
+// High level catch for "using", should determine what kind of interaction
+// and delegate to the proper subsystem
+void AViveCharacter::Use() {
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed"));
-	//GrabComponent->
+	// Project out and see what is there, then determine what to do with it.
+	// Perhaps project on tick and then have it here? Switch on enum
+	// ex: Physics, Press (default), Hack, 
+	GrabComponent->Grab(); // Temp call
 }
 
-void AViveCharacter::Release() {
+void AViveCharacter::UseRelease() {
 	UE_LOG(LogTemp, Warning, TEXT("Grab released"));
 }
 

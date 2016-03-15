@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "GrabComponent.h"
 #include "GameFramework/Character.h"
 #include "ViveCharacter.generated.h"
-
 
 UCLASS()
 class VIVE_API AViveCharacter : public ACharacter
@@ -28,8 +28,8 @@ protected:
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 
-	//UGrabComponent* GrabComponent;
+	UGrabComponent* GrabComponent = nullptr;
 
-	void Grab();
-	void Release();
+	void Use();
+	void UseRelease();
 };
