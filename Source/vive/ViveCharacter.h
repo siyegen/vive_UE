@@ -32,4 +32,8 @@ protected:
 
 	void Use();
 	void UseRelease();
+private:
+	FCollisionQueryParams TraceParams = nullptr;
+	UPROPERTY(EditAnywhere)
+	float InteractDist = 150.f;
 };

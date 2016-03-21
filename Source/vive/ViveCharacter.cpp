@@ -3,7 +3,7 @@
 #include "vive.h"
 #include "ViveCharacter.h"
 
-
+#define ECC_INTERACT_WITH ECC_GameTraceChannel1 
 // Sets default values
 AViveCharacter::AViveCharacter()
 {
@@ -17,6 +17,7 @@ AViveCharacter::AViveCharacter()
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Jack shit"));
 	}
+	TraceParams = FCollisionQueryParams(FName(TEXT("")), false, this);
 }
 
 // Called when the game starts or when spawned
@@ -29,6 +30,24 @@ void AViveCharacter::BeginPlay()
 void AViveCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+	FVector PlayerLocation;
+	FRotator PlayerRotator;
+	FHitResult LineHit;
+
+	GetActorEyesViewPoint(PlayerLocation, PlayerRotator);
+	FVector EndTrace = PlayerLocation + PlayerRotator.Vector() * 150.f;
+	DrawDebugLine(GetWorld(), PlayerLocation, EndTrace, FColor(255, 0, 0), false, 0.f, 0.f, 10.f);
+	bool DidHit = GetWorld()->LineTraceSingleByChannel(
+		LineHit,
+		PlayerLocation,
+		EndTrace,
+		ECollisionChannel::ECC_INTERACT_WITH,
+		TraceParams,
+		FCollisionResponseParams(ECollisionResponse::ECR_Block)
+	);
+	if (DidHit) {
+		UE_LOG(LogTemp, Warning, TEXT("%s hit!"), *LineHit.GetActor()->GetName());
+	}
 }
 
 // Called to bind functionality to input
