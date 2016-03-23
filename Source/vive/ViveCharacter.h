@@ -32,8 +32,13 @@ protected:
 
 	void Use();
 	void UseRelease();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Testing)
+	FString LookingAt = ""; // Temp Var to test HUD
 private:
 	FCollisionQueryParams TraceParams = nullptr;
 	UPROPERTY(EditAnywhere)
 	float InteractDist = 150.f;
+	UPROPERTY(EditAnywhere)
+	bool DrawDebug = false;
 };

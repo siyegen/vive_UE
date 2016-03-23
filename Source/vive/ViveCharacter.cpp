@@ -4,6 +4,9 @@
 #include "ViveCharacter.h"
 
 #define ECC_INTERACT_WITH ECC_GameTraceChannel1 
+
+const FName Physics = FName(TEXT("Physics"));;
+const FName Switch = FName(TEXT("Switch"));
 // Sets default values
 AViveCharacter::AViveCharacter()
 {
@@ -36,7 +39,9 @@ void AViveCharacter::Tick( float DeltaTime )
 
 	GetActorEyesViewPoint(PlayerLocation, PlayerRotator);
 	FVector EndTrace = PlayerLocation + PlayerRotator.Vector() * 150.f;
-	DrawDebugLine(GetWorld(), PlayerLocation, EndTrace, FColor(255, 0, 0), false, 0.f, 0.f, 10.f);
+	if (DrawDebug) {
+		DrawDebugLine(GetWorld(), PlayerLocation, EndTrace, FColor(255, 0, 0), false, 0.f, 0.f, 10.f);
+	}	
 	bool DidHit = GetWorld()->LineTraceSingleByChannel(
 		LineHit,
 		PlayerLocation,
@@ -47,6 +52,22 @@ void AViveCharacter::Tick( float DeltaTime )
 	);
 	if (DidHit) {
 		UE_LOG(LogTemp, Warning, TEXT("%s hit!"), *LineHit.GetActor()->GetName());
+		//LineHit.GetActor()->Tags
+		for (FName Tag : LineHit.GetComponent()->ComponentTags) {
+			if (Tag == Physics) {
+				LookingAt = "Physics Object";
+				break;
+			} else if (Tag == Switch) {
+				LookingAt = "Switch";
+				break;
+			} else {
+				UE_LOG(LogTemp, Warning, TEXT("%s No hit"), *Tag.ToString());
+			}
+			if (LookingAt != "")
+				UE_LOG(LogTemp, Warning, TEXT("%s hit!"), *LookingAt);
+		}
+	} else {
+		LookingAt = "";
 	}
 }
 
