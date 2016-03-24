@@ -5,8 +5,9 @@
 
 #define ECC_INTERACT_WITH ECC_GameTraceChannel1 
 
-const FName Physics = FName(TEXT("Physics"));;
+const FName Physics = FName(TEXT("Physics"));
 const FName Switch = FName(TEXT("Switch"));
+const FName InteractWith = FName(TEXT("InteractWith"));
 // Sets default values
 AViveCharacter::AViveCharacter()
 {
@@ -37,7 +38,7 @@ void AViveCharacter::Tick( float DeltaTime )
 	FRotator PlayerRotator;
 	FHitResult LineHit;
 
-	GetActorEyesViewPoint(PlayerLocation, PlayerRotator);
+	GetController()->GetPlayerViewPoint(PlayerLocation, PlayerRotator);
 	FVector EndTrace = PlayerLocation + PlayerRotator.Vector() * 150.f;
 	if (DrawDebug) {
 		DrawDebugLine(GetWorld(), PlayerLocation, EndTrace, FColor(255, 0, 0), false, 0.f, 0.f, 10.f);
@@ -50,9 +51,10 @@ void AViveCharacter::Tick( float DeltaTime )
 		TraceParams,
 		FCollisionResponseParams(ECollisionResponse::ECR_Block)
 	);
-	if (DidHit) {
+	AActor* ActorHit = nullptr;
+	if (DidHit) ActorHit = LineHit.GetActor();
+	if (ActorHit) {
 		UE_LOG(LogTemp, Warning, TEXT("%s hit!"), *LineHit.GetActor()->GetName());
-		//LineHit.GetActor()->Tags
 		for (FName Tag : LineHit.GetComponent()->ComponentTags) {
 			if (Tag == Physics) {
 				LookingAt = "Physics Object";
