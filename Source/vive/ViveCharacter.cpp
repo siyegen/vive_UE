@@ -14,7 +14,7 @@ AViveCharacter::AViveCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	/// Get Grab component
+
 	GrabComponent = CreateDefaultSubobject<UGrabComponent>(TEXT("GrabComponent"));
 	if (GrabComponent) {
 		UE_LOG(LogTemp, Warning, TEXT("Got grabber"));
@@ -34,25 +34,10 @@ void AViveCharacter::BeginPlay()
 void AViveCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	FVector PlayerLocation;
-	FRotator PlayerRotator;
-	FHitResult LineHit;
+	FHitResult LineHit = GetFirstInteractWithInReach();
 
-	GetController()->GetPlayerViewPoint(PlayerLocation, PlayerRotator);
-	FVector EndTrace = PlayerLocation + PlayerRotator.Vector() * 150.f;
-	if (DrawDebug) {
-		DrawDebugLine(GetWorld(), PlayerLocation, EndTrace, FColor(255, 0, 0), false, 0.f, 0.f, 10.f);
-	}	
-	bool DidHit = GetWorld()->LineTraceSingleByChannel(
-		LineHit,
-		PlayerLocation,
-		EndTrace,
-		ECollisionChannel::ECC_INTERACT_WITH,
-		TraceParams,
-		FCollisionResponseParams(ECollisionResponse::ECR_Block)
-	);
-	AActor* ActorHit = nullptr;
-	if (DidHit) ActorHit = LineHit.GetActor();
+	// find component and set lookingat value
+	AActor* ActorHit = LineHit.GetActor();
 	if (ActorHit) {
 		UE_LOG(LogTemp, Warning, TEXT("%s hit!"), *LineHit.GetActor()->GetName());
 		for (FName Tag : LineHit.GetComponent()->ComponentTags) {
@@ -111,5 +96,27 @@ void AViveCharacter::Use() {
 
 void AViveCharacter::UseRelease() {
 	UE_LOG(LogTemp, Warning, TEXT("Grab released"));
+}
+
+// Find the first "Interact With" item in reach and return the hit result
+const FHitResult AViveCharacter::GetFirstInteractWithInReach() {
+	FVector PlayerLocation;
+	FRotator PlayerRotator;
+	FHitResult LineHit;
+
+	GetController()->GetPlayerViewPoint(PlayerLocation, PlayerRotator);
+	FVector EndTrace = PlayerLocation + PlayerRotator.Vector() * InteractDist;
+	if (DrawDebug) {
+		DrawDebugLine(GetWorld(), PlayerLocation, EndTrace, FColor(255, 0, 0), false, 0.f, 0.f, 10.f);
+	}
+	GetWorld()->LineTraceSingleByChannel(
+		LineHit,
+		PlayerLocation,
+		EndTrace,
+		ECollisionChannel::ECC_INTERACT_WITH,
+		TraceParams
+	);
+
+	return LineHit;
 }
 

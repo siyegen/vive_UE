@@ -41,4 +41,6 @@ private:
 	float InteractDist = 150.f;
 	UPROPERTY(EditAnywhere)
 	bool DrawDebug = false;
+
+	const FHitResult GetFirstInteractWithInReach();
 };
